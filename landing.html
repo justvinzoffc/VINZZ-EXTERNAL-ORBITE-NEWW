@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Vinzz Externall</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family: Arial, sans-serif;
+}
+body{
+  margin:0;
+  background:#0d0d0d;
+  color:white;
+  overflow-x:hidden;
+}
+
+/* VIDEO BACKGROUND */
+.bg-video{
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-2;
+}
+
+/* OVERLAY BLUR */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  backdrop-filter: blur(5px);
+  z-index:-1;
+}
+
+/* APP BAR */
+.header{
+  height:60px;
+  background:rgba(0,0,0,.3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.header img{
+  height:48px;
+}
+
+/* CONTENT */
+.container{
+  padding:20px;
+  max-width:420px;
+  margin:auto;
+}
+
+/* VIDEO CARD */
+.video-card{
+  border-radius:20px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 0 25px rgba(229,57,53,.6);
+}
+.video-card video{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+}
+.video-card::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  backdrop-filter: blur(1px);
+  background:rgba(0,0,0,.3);
+}
+.video-title{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:36px;
+  font-weight:bold;
+  color:#ef5350;
+  text-shadow:2px 2px 8px rgba(0,0,0,.8);
+  z-index:2;
+}
+
+/* BUTTONS */
+.btn{
+  width:100%;
+  height:48px;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.btn-login{
+  background:#e53935;
+  color:white;
+  border:none;
+  box-shadow:0 5px 15px rgba(229,57,53,.6);
+}
+.btn-register{
+  background:transparent;
+  color:#e53935;
+  border:2px solid #e53935;
+}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:16px 0;
+}
+.footer i{
+  font-size:28px;
+  color:#e53935;
+}
+.small{
+  font-size:12px;
+  color:#bbb;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ❗ Hapus Session Saat Masuk Halaman Ini (Agar Tidak Auto Login Dashboard) -->
+<script>
+localStorage.removeItem("isLogin");
+localStorage.removeItem("username");
+localStorage.removeItem("role");
+</script>
+
+<!-- Background Video -->
+<video class="bg-video" autoplay loop muted>
+  <source src="https://files.catbox.moe/scpq8t.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
+<!-- App Bar -->
+<div class="header">
+  <img src="https://files.catbox.moe/x6243j.jpg">
+</div>
+
+<div class="container">
+
+  <!-- Video Card -->
+  <div class="video-card">
+    <video autoplay loop muted>
+      <source src="https://files.catbox.moe/scpq8t.mp4" type="video/mp4">
+    </video>
+    <div class="video-title">VINZZ EXTERNALL</div>
+  </div>
+
+  <div style="height:90px"></div>
+
+  <p style="text-align:center;color:#ccc;font-size:14px">
+    Please Log in or Register to continue
+  </p>
+
+  <div style="height:20px"></div>
+
+  <button class="btn btn-login" onclick="goLogin()">Login</button>
+
+  <div style="height:14px"></div>
+
+  <button class="btn btn-register" onclick="openRegister()">Register</button>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div style="color:#aaa;font-size:14px">Contact Us</div>
+  <div style="margin:8px 0">
+    <i class="fa-brands fa-telegram" onclick="openTelegram()"></i>
+  </div>
+  <div class="small">© 2025 Vinzz Official</div>
+</div>
+
+<script>
+function goLogin(){
+  window.location.href="login.html";
+}
+function openRegister(){
+  window.open("https://t.me/vinzzloww","_blank");
+}
+function openTelegram(){
+  window.open("https://t.me/vinzzloww","_blank");
+}
+</script>
+
+</body>
+</html>

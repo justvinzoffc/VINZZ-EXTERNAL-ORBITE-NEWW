@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NGL Auto Spammer</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#000;
+  --card:#1a1a1a;
+  --red:#d32f2f;
+  --red2:#ff5252;
+  --light:#ef5350;
+  --white:#fff;
+  --grey:#aaa;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--white);
+  font-family:Orbitron;
+  padding:16px;
+}
+
+.card{
+  background:var(--card);
+  padding:16px;
+  border-radius:16px;
+  border:1px solid rgba(211,47,47,.3);
+  box-shadow:0 4px 8px rgba(211,47,47,.2);
+  margin-bottom:20px;
+}
+
+input, textarea{
+  width:100%;
+  padding:14px;
+  margin-bottom:12px;
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.5);
+  background:#000;
+  color:#fff;
+  font-size:16px;
+}
+
+textarea{resize:none}
+
+input:focus, textarea:focus{
+  outline:none;
+  border:2px solid var(--light);
+}
+
+.btn{
+  flex:1;
+  padding:16px;
+  border:none;
+  border-radius:12px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#fff;
+}
+
+.btn-start{background:var(--red)}
+.btn-stop{background:var(--red2)}
+
+.btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.row{
+  display:flex;
+  gap:16px;
+}
+
+.status-header{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:linear-gradient(90deg,var(--red),var(--red2));
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.status-box{
+  margin-top:12px;
+  padding:12px;
+  background:rgba(0,0,0,.4);
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.2);
+  min-height:80px;
+  font-family:'Share Tech Mono';
+  font-size:16px;
+}
+
+.counter{
+  margin-top:16px;
+  padding:12px;
+  text-align:center;
+  border-radius:8px;
+  border:1px solid rgba(211,47,47,.3);
+  background:rgba(211,47,47,.1);
+}
+
+.info{
+  margin-top:12px;
+  padding:12px;
+  font-size:12px;
+  border-radius:8px;
+  background:rgba(0,0,0,.4);
+  border:1px solid rgba(211,47,47,.1);
+  color:var(--grey);
+}
+</style>
+</head>
+<body>
+
+<h2 style="text-align:center">NGL AUTO SPAMMER</h2>
+
+<div class="card">
+  <input id="username" placeholder="Username NGL">
+  <textarea id="message" rows="3" placeholder="Masukkan pesan..."></textarea>
+</div>
+
+<div class="card">
+  <div class="row">
+    <button id="startBtn" class="btn btn-start" onclick="startLoop()">START</button>
+    <button id="stopBtn" class="btn btn-stop" onclick="stopLoop()" disabled>STOP</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="status-header">STATUS LOG</div>
+
+  <div id="statusLog" class="status-box" style="color:#fff">
+    Menunggu perintah...
+  </div>
+
+  <div id="counterBox" class="counter" style="display:none">
+    Total terkirim: <b><span id="counter">0</span></b>
+  </div>
+
+  <div class="info">
+    Auto send setiap 2 detik. Stop manual jika sudah cukup.
+  </div>
+</div>
+
+<script>
+let isRunning = false;
+let counter = 0;
+let timer = null;
+
+function randomDeviceId(len){
+  const chars = "abcdef0123456789";
+  let out = "";
+  for(let i=0;i<len;i++){
+    out += chars[Math.floor(Math.random()*chars.length)];
+  }
+  return out;
+}
+
+function status(text){
+  const el = document.getElementById("statusLog");
+  el.innerText = text;
+
+  if(text.includes("✅")) el.style.color = "lightgreen";
+  else if(text.includes("❌")) el.style.color = "red";
+  else if(text.includes("⚠️")) el.style.color = "orange";
+  else if(text.includes("▶️")) el.style.color = "lightgreen";
+  else if(text.includes("⏹️")) el.style.color = "orange";
+  else el.style.color = "#fff";
+}
+
+async function sendMessage(username, message){
+  const deviceId = randomDeviceId(42);
+
+  try{
+    const res = await fetch("https://ngl.link/api/submit",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Requested-With":"XMLHttpRequest",
+        "User-Agent":"Mozilla/5.0",
+        "Referer":"https://ngl.link/"+username,
+        "Origin":"https://ngl.link"
+      },
+      body:`username=${encodeURIComponent(username)}&question=${encodeURIComponent(message)}&deviceId=${deviceId}&gameSlug=&referrer=`
+    });
+
+    if(res.status === 200){
+      counter++;
+      document.getElementById("counter").innerText = counter;
+      document.getElementById("counterBox").style.display="block";
+      status(`✅ [${counter}] Pesan terkirim`);
+    }else{
+      status(`❌ Ratelimit (${res.status}), tunggu 5 detik...`);
+      await new Promise(r=>setTimeout(r,5000));
+    }
+
+  }catch(e){
+    status("⚠️ Error: "+e);
+    await new Promise(r=>setTimeout(r,2000));
+  }
+}
+
+function startLoop(){
+  const username = document.getElementById("username").value.trim();
+  const message = document.getElementById("message").value.trim();
+
+  if(!username || !message){
+    status("⚠️ Harap isi username & pesan!");
+    return;
+  }
+
+  isRunning = true;
+  counter = 0;
+  document.getElementById("counter").innerText = "0";
+  document.getElementById("counterBox").style.display="none";
+
+  status("▶️ Mulai mengirim...");
+
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("stopBtn").disabled = false;
+
+  timer = setInterval(()=>{
+    if(isRunning) sendMessage(username,message);
+  },2000);
+}
+
+function stopLoop(){
+  isRunning = false;
+  clearInterval(timer);
+  status("⏹️ Dihentikan.");
+
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("stopBtn").disabled = true;
+}
+</script>
+
+</body>
+</html>

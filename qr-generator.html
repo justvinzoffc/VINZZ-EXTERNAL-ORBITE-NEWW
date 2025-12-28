@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR - Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --dark:#000;
+  --card:#1a1a1a;
+  --red:#d32f2f;
+  --red-light:#ef5350;
+  --grey:#bdbdbd;
+  --white:#fff;
+}
+
+*{box-sizing:border-box;font-family:Orbitron}
+
+body{
+  margin:0;
+  background:var(--dark);
+  color:var(--white);
+  padding:16px;
+}
+
+.header{
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:16px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px;
+  border:1px solid rgba(211,47,47,.3);
+  box-shadow:0 4px 10px rgba(211,47,47,.2);
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.5);
+  background:#000;
+  color:#fff;
+  font-size:15px;
+}
+
+input:focus{
+  outline:none;
+  border:2px solid var(--red-light);
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:16px;
+  border:none;
+  border-radius:12px;
+  background:var(--red);
+  color:#fff;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.loading{
+  text-align:center;
+  margin-top:10px;
+  color:var(--red-light);
+}
+
+.error{
+  margin-top:16px;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(255,0,0,.1);
+  border:1px solid rgba(255,0,0,.3);
+  color:#ff5252;
+}
+
+.qr-box{
+  margin-top:20px;
+  padding:20px;
+  border-radius:16px;
+  background:var(--card);
+  border:1px solid rgba(211,47,47,.3);
+  text-align:center;
+}
+
+.qr-img{
+  background:#fff;
+  padding:16px;
+  border-radius:12px;
+  border:2px solid rgba(211,47,47,.5);
+  display:inline-block;
+}
+
+.info{
+  margin-top:12px;
+  padding:10px;
+  border-radius:8px;
+  background:rgba(211,47,47,.1);
+  border:1px solid rgba(211,47,47,.2);
+  color:var(--red-light);
+  font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">QR GENERATOR</div>
+
+<div class="card">
+  <input id="textInput" placeholder="Masukkan Text / URL">
+  <button id="generateBtn" onclick="generateQR()">GENERATE QR</button>
+  <div class="loading" id="loading" style="display:none;">GENERATING...</div>
+</div>
+
+<div class="error" id="error" style="display:none;"></div>
+
+<div class="qr-box" id="qrBox" style="display:none;">
+  <div class="qr-img">
+    <img id="qrImage" width="200">
+  </div>
+
+  <button onclick="downloadQR()" style="margin-top:16px;background:#ff5252;">
+    DOWNLOAD QR
+  </button>
+
+  <div class="info">QR Code berhasil digenerate!</div>
+</div>
+
+<script>
+const input = document.getElementById('textInput');
+const loading = document.getElementById('loading');
+const errorBox = document.getElementById('error');
+const qrBox = document.getElementById('qrBox');
+const qrImg = document.getElementById('qrImage');
+const btn = document.getElementById('generateBtn');
+
+function generateQR(){
+  const text = input.value.trim();
+  if(!text){
+    showError("Text tidak boleh kosong.");
+    return;
+  }
+
+  hideError();
+  qrBox.style.display="none";
+  loading.style.display="block";
+  btn.disabled=true;
+
+  const url = "https://api.siputzx.my.id/api/tools/text2qr?text=" 
+              + encodeURIComponent(text);
+
+  fetch(url)
+    .then(res=>{
+      if(!res.ok) throw "Gagal generate QR";
+      return res.blob();
+    })
+    .then(blob=>{
+      qrImg.src = URL.createObjectURL(blob);
+      qrBox.style.display="block";
+    })
+    .catch(err=>{
+      showError(err.toString());
+    })
+    .finally(()=>{
+      loading.style.display="none";
+      btn.disabled=false;
+    });
+}
+
+function downloadQR(){
+  const a = document.createElement('a');
+  a.href = qrImg.src;
+  a.download = "qr_code.png";
+  a.click();
+}
+
+function showError(msg){
+  errorBox.innerText = msg;
+  errorBox.style.display="block";
+}
+
+function hideError(){
+  errorBox.style.display="none";
+}
+</script>
+
+</body>
+</html>

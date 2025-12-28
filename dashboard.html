@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Externall - Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+<style>
+:root{
+  --black:#000;--card:#1a1a1a;--red:#e53935;--red-dark:#b71c1c;
+  --red-light:#ef5350;--white:#fff;--grey:#aaa;
+}
+*{box-sizing:border-box;font-family:Orbitron}
+body{margin:0;background:var(--black);color:var(--white)}
+.appbar{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 15px rgba(229,57,53,.6)}
+.appbar h1{font-size:20px;margin:0;text-shadow:0 0 10px var(--red)}
+.user-btn{background:linear-gradient(45deg,var(--red),var(--red-dark));border:none;border-radius:50%;width:40px;height:40px;color:white}
+.drawer{position:fixed;top:0;left:-260px;width:260px;height:100%;background:var(--black);transition:.3s;z-index:10}
+.drawer.open{left:0}
+.drawer-header{padding:20px;background:linear-gradient(45deg,var(--red),var(--red-dark))}
+.drawer a{display:block;padding:14px 20px;color:white;text-decoration:none}
+.drawer a:hover{background:rgba(229,57,53,.2)}
+.main{padding:16px;padding-bottom:90px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;border:1px solid rgba(229,57,53,.3);box-shadow:0 0 10px rgba(229,57,53,.2)}
+.news{display:flex;gap:12px;overflow-x:auto}
+.news-item{min-width:85%;height:180px;border-radius:14px;position:relative;overflow:hidden}
+.news-item img,.news-item video{width:100%;height:100%;object-fit:cover}
+.news-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
+.news-text{position:absolute;bottom:10px;left:10px;right:10px}
+.news-text h3{margin:0;font-size:14px;text-shadow:0 0 8px var(--red)}
+.news-text p{font-family:'Share Tech Mono';font-size:12px;color:var(--red-light)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{background:rgba(0,0,0,.4);padding:10px;border-radius:10px}
+.info-item span{font-size:12px;color:var(--grey)}
+.info-item strong{display:block;font-family:'Share Tech Mono';margin-top:2px}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(45deg,var(--red),var(--red-dark));color:white;font-weight:bold;cursor:pointer}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid rgba(229,57,53,.3)}
+.bottom button{background:none;border:none;color:var(--grey)}
+.bottom button.active{color:var(--red-light)}
+</style>
+</head>
+
+<body>
+
+<!-- DRAWER FINAL -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2>Externall</h2>
+    <small id="name">User: ...</small><br>
+    <small id="role">Role: ...</small><br>
+    <small id="exp">Expired: ...</small>
+  </div>
+
+  <!-- FIXED FINAL LINKS -->
+  <a href="nik-checker.html">NIK CHEKER</a>
+  <a href="tiktok-donwloader.html">TIKTOK DONWLOADER</a>
+  <a href="instagram.html">IG DONWLOAD</a>
+  <a href="qr-generator.html">QR GENERATOR</a>
+  <a href="ngl.html">SPAM NGL</a>
+  <a href="bug-sender.html">MANAGE BUG SENDER</a>
+</div>
+
+<!-- APPBAR -->
+<div class="appbar">
+  <button onclick="toggleDrawer()">☰</button>
+  <h1>Vinzz Externall</h1>
+  <button class="user-btn"><i class="fa fa-user"></i></button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- NEWS -->
+<div class="card">
+  <div class="news">
+    <div class="news-item">
+      <img src="https://picsum.photos/600/400">
+      <div class="news-overlay"></div>
+      <div class="news-text">
+        <h3>System Update</h3>
+        <p>New features deployed</p>
+      </div>
+    </div>
+    <div class="news-item">
+      <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay muted loop></video>
+      <div class="news-overlay"></div>
+      <div class="news-text">
+        <h3>Announcement</h3>
+        <p>Video news preview</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT INFO -->
+<div class="card">
+  <button class="btn"><i class="fa fa-user"></i> ACCOUNT INFO</button>
+
+  <div class="info">
+    <div class="info-item"><span>Username</span><strong id="usernameTxt">Loading...</strong></div>
+    <div class="info-item"><span>Role</span><strong id="roleTxt">Loading...</strong></div>
+    <div class="info-item"><span>Online</span><strong>7</strong></div>
+    <div class="info-item"><span>Connections</span><strong>∞</strong></div>
+  </div><br>
+
+  <button class="btn" onclick="location.href='bug-sender.html'">
+    <i class="fa fa-bug"></i> MANAGE BUG SENDER
+  </button>
+</div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom">
+  <button class="active"><i class="fa fa-home"></i><br>Home</button>
+  <button onclick="location.href='home.html'"><i class="fa fa-whatsapp"></i><br>WhatsApp</button>
+  <button onclick="location.href='tools-dashboard.html'"><i class="fa fa-wrench"></i><br>Tools</button>
+</div>
+
+<script>
+function toggleDrawer(){
+  document.getElementById('drawer').classList.toggle('open');
+}
+
+// Ambil session login dari localStorage
+const loginUser = localStorage.getItem("username");
+const loginRole = localStorage.getItem("role");
+
+// Jika belum login → kembali ke login
+if(!loginUser){ location.href="index.html"; }
+
+// Load JSON GitHub
+const dataURL = "https://raw.githubusercontent.com/justvinzoffc/APK-BUG-VINZZ-EXTERNALL/main/keys.json";
+
+fetch(dataURL)
+.then(res=>res.json())
+.then(db=>{
+  const user = db.users.find(u=>u.username === loginUser);
+
+  if(!user){
+      alert("Akun tidak ditemukan di server!");
+      localStorage.clear();
+      location.href="index.html";
+      return;
+  }
+
+  document.getElementById("name").innerText = "User: " + user.username;
+  document.getElementById("role").innerText = "Role: " + user.role;
+  document.getElementById("exp").innerText  = "Expired: " + user.expired;
+  document.getElementById("usernameTxt").innerText = user.username;
+  document.getElementById("roleTxt").innerText     = user.role;
+})
+.catch(()=>console.log("Gagal memuat JSON"));
+</script>
+
+</body>
+</html>

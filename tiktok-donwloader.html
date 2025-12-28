@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>TikTok Downloader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --dark:#000;
+  --card:#1a1a1a;
+  --red:#d32f2f;
+  --red2:#ef5350;
+  --white:#fff;
+  --grey:#aaa;
+}
+
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+
+body{
+  background:var(--dark);
+  color:var(--white);
+  margin:0;
+}
+
+header{
+  text-align:center;
+  padding:16px;
+  font-family:Orbitron;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+.container{
+  padding:16px;
+  max-width:700px;
+  margin:auto;
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px;
+  border:1px solid rgba(211,47,47,.3);
+  box-shadow:0 4px 10px rgba(211,47,47,.25);
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.5);
+  background:#000;
+  color:#fff;
+  font-size:15px;
+}
+
+button{
+  width:100%;
+  margin-top:14px;
+  padding:14px;
+  background:var(--red);
+  border:none;
+  border-radius:12px;
+  color:#fff;
+  font-weight:bold;
+  font-family:Orbitron;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.6;
+}
+
+.error{
+  margin-top:16px;
+  background:rgba(255,0,0,.15);
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,0,0,.4);
+  color:#ff6b6b;
+}
+
+.video-box{
+  margin-top:20px;
+}
+
+.video-box video{
+  width:100%;
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.6);
+  box-shadow:0 6px 14px rgba(211,47,47,.4);
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:linear-gradient(90deg,var(--red),red);
+  padding:6px 12px;
+  border-radius:8px;
+  font-family:Orbitron;
+  font-size:13px;
+}
+
+.info{
+  margin-top:14px;
+  background:rgba(0,0,0,.4);
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.25);
+}
+
+.actions{
+  display:flex;
+  gap:12px;
+  margin-top:14px;
+}
+
+.actions a, .actions button{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  background:var(--red2);
+  padding:14px;
+  border-radius:12px;
+  color:#fff;
+  font-family:Orbitron;
+  font-weight:bold;
+}
+.placeholder{
+  text-align:center;
+  margin-top:60px;
+  color:var(--grey);
+}
+</style>
+</head>
+<body>
+
+<header>TIKTOK DOWNLOADER</header>
+
+<div class="container">
+
+  <div class="card">
+    <input id="url" placeholder="https://vt.tiktok.com/xxxx">
+    <button id="btn">DOWNLOAD</button>
+  </div>
+
+  <div id="error"></div>
+  <div id="result"></div>
+
+  <div id="placeholder" class="placeholder">
+    <h2 style="font-family:Orbitron">TikTok Downloader</h2>
+    <p>Masukkan URL TikTok untuk mendownload video</p>
+  </div>
+
+</div>
+
+<script>
+const btn = document.getElementById("btn");
+const urlInput = document.getElementById("url");
+const errorBox = document.getElementById("error");
+const resultBox = document.getElementById("result");
+const placeholder = document.getElementById("placeholder");
+
+btn.onclick = async () => {
+  const url = urlInput.value.trim();
+  if(!url){
+    showError("URL TikTok tidak boleh kosong.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = "PROSES...";
+  errorBox.innerHTML = "";
+  resultBox.innerHTML = "";
+  placeholder.style.display = "none";
+
+  try{
+    const res = await fetch(`https://api.siputzx.my.id/api/d/tiktok?url=${encodeURIComponent(url)}`);
+    const json = await res.json();
+
+    if(!json.status || !json.data){
+      showError("Gagal mengambil data TikTok.");
+      resetBtn();
+      return;
+    }
+
+    renderVideo(json.data);
+  }catch(e){
+    showError("Terjadi kesalahan: " + e);
+  }
+
+  resetBtn();
+};
+
+function resetBtn(){
+  btn.disabled = false;
+  btn.innerText = "DOWNLOAD";
+}
+
+function showError(msg){
+  errorBox.innerHTML = `<div class="error">${msg}</div>`;
+}
+
+function renderVideo(data){
+  const videoUrl = data.urls[0];
+  const meta = data.metadata || {};
+
+  resultBox.innerHTML = `
+    <div class="card video-box">
+      <div class="badge">🎥 VIDEO PREVIEW</div>
+
+      <video controls autoplay>
+        <source src="${videoUrl}" type="video/mp4">
+      </video>
+
+      <div class="info">
+        <b>${meta.title || "No Title"}</b><br>
+        <small>Creator: ${meta.creator || "Unknown"}</small>
+      </div>
+
+      <div class="actions">
+        <a href="${videoUrl}" download target="_blank">DOWNLOAD</a>
+        <button onclick="shareVideo('${videoUrl}','${meta.creator || "TikTok"}')">SHARE</button>
+      </div>
+    </div>
+  `;
+}
+
+async function shareVideo(url, creator){
+  if(navigator.share){
+    await navigator.share({
+      title: "TikTok Video",
+      text: `Video TikTok dari ${creator}`,
+      url
+    });
+  }else{
+    alert("Browser tidak mendukung Share API");
+  }
+}
+</script>
+
+</body>
+</html>

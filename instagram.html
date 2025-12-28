@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSTAGRAM - Downloader</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:'Orbitron', sans-serif;
+}
+
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+}
+
+.appbar{
+  text-align:center;
+  padding:16px;
+  font-weight:bold;
+  font-size:18px;
+  background:#000;
+  border-bottom:1px solid #D32F2F;
+}
+
+.container{
+  padding:16px;
+}
+
+.card{
+  background:#1a1a1a;
+  border-radius:16px;
+  padding:16px;
+  border:1px solid rgba(211,47,47,.3);
+  box-shadow:0 4px 12px rgba(211,47,47,.2);
+  margin-bottom:20px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.5);
+  background:#000;
+  color:#fff;
+  outline:none;
+}
+
+button{
+  width:100%;
+  margin-top:16px;
+  padding:14px;
+  background:#D32F2F;
+  border:none;
+  border-radius:12px;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.6;
+}
+
+.error{
+  background:rgba(255,0,0,.1);
+  border:1px solid rgba(255,0,0,.3);
+  padding:12px;
+  border-radius:12px;
+  color:#ff5252;
+  margin-bottom:16px;
+}
+
+.video-card{
+  margin-top:16px;
+}
+
+video{
+  width:100%;
+  border-radius:12px;
+  border:1px solid rgba(211,47,47,.5);
+}
+
+.share-btn{
+  margin-top:12px;
+  background:red;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.grid-item{
+  background:#1a1a1a;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid rgba(211,47,47,.3);
+}
+
+.grid-item img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+}
+
+.grid-label{
+  text-align:center;
+  padding:8px;
+  font-size:12px;
+  color:#EF5350;
+}
+.placeholder{
+  text-align:center;
+  margin-top:80px;
+  color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="appbar">INSTAGRAM DOWNLOADER</div>
+
+<div class="container">
+
+  <div class="card">
+    <input id="igUrl" placeholder="Masukkan URL Instagram">
+    <button id="downloadBtn">DOWNLOAD</button>
+  </div>
+
+  <div id="errorBox" class="error" style="display:none;"></div>
+
+  <div id="videoSection" class="card video-card" style="display:none;">
+    <video id="videoPlayer" controls autoplay></video>
+    <button class="share-btn" onclick="shareVideo()">SHARE VIDEO</button>
+  </div>
+
+  <div id="gridSection" class="card" style="display:none;">
+    <div class="grid" id="mediaGrid"></div>
+  </div>
+
+  <div id="placeholder" class="placeholder">
+    <h3>Instagram Downloader</h3>
+    <p>Masukkan URL Reel, Post, atau Story</p>
+  </div>
+
+</div>
+
+<script>
+const btn = document.getElementById("downloadBtn");
+const input = document.getElementById("igUrl");
+const errorBox = document.getElementById("errorBox");
+const videoSection = document.getElementById("videoSection");
+const videoPlayer = document.getElementById("videoPlayer");
+const gridSection = document.getElementById("gridSection");
+const mediaGrid = document.getElementById("mediaGrid");
+const placeholder = document.getElementById("placeholder");
+
+let mediaData = [];
+
+btn.onclick = async () => {
+  const url = input.value.trim();
+  if(!url){
+    showError("URL Instagram tidak boleh kosong");
+    return;
+  }
+
+  resetUI();
+  btn.disabled = true;
+  btn.innerText = "PROSES...";
+
+  try{
+    const api = `https://api.siputzx.my.id/api/d/igdl?url=${encodeURIComponent(url)}`;
+    const res = await fetch(api);
+    const json = await res.json();
+
+    if(json.status && json.data){
+      mediaData = json.data;
+      showGrid();
+    }else{
+      showError("Gagal mengambil data Instagram");
+    }
+
+  }catch(e){
+    showError("Terjadi kesalahan");
+  }
+
+  btn.disabled = false;
+  btn.innerText = "DOWNLOAD";
+};
+
+function showGrid(){
+  placeholder.style.display = "none";
+  gridSection.style.display = "block";
+  mediaGrid.innerHTML = "";
+
+  mediaData.forEach(m=>{
+    const div = document.createElement("div");
+    div.className = "grid-item";
+    div.innerHTML = `
+      <img src="${m.thumbnail || m.url}">
+      <div class="grid-label">${m.type.toUpperCase()}</div>
+    `;
+    if(m.type === "video"){
+      div.onclick = ()=> playVideo(m.url);
+    }
+    mediaGrid.appendChild(div);
+  });
+}
+
+function playVideo(url){
+  videoSection.style.display = "block";
+  videoPlayer.src = url;
+  videoPlayer.play();
+}
+
+function shareVideo(){
+  if(navigator.share){
+    navigator.share({
+      title:"Instagram Video",
+      url: videoPlayer.src
+    });
+  }else{
+    alert("Share tidak didukung di browser ini");
+  }
+}
+
+function showError(msg){
+  errorBox.style.display = "block";
+  errorBox.innerText = msg;
+}
+
+function resetUI(){
+  errorBox.style.display = "none";
+  videoSection.style.display = "none";
+  gridSection.style.display = "none";
+}
+</script>
+
+</body>
+</html>

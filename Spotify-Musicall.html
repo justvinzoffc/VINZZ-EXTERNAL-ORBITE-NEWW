@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinzz Externall - SPOTIFY 🎶</title>
+<style>
+body{
+    margin:0;font-family:"Poppins",sans-serif;
+    background:linear-gradient(135deg,#000,#0a061a,#000);
+    color:white;text-align:center;
+}
+h2{
+    margin-top:40px;font-size:30px;
+    background:linear-gradient(90deg,#1db954,#00eaff);
+    -webkit-background-clip:text;color:transparent;font-weight:800;
+}
+.search-box{
+    margin-top:30px;display:flex;justify-content:center;gap:10px;
+}
+input{
+    width:60%;padding:14px;border-radius:40px;font-size:17px;
+    border:none;outline:none;background:rgba(255,255,255,0.07);color:#fff;
+    box-shadow:0 0 10px #00eaff33 inset,0 0 8px #00eaff66;
+    backdrop-filter:blur(15px);
+}
+input::placeholder{color:#bbb;}
+button{
+    padding:14px 26px;border-radius:40px;border:none;
+    font-size:16px;font-weight:600;
+    cursor:pointer;color:white;
+    background:linear-gradient(45deg,#1db954,#00eaff);
+    box-shadow:0 0 10px #1db954,0 0 18px #00eaff;
+    transition:.3s;
+}
+button:hover{transform:scale(1.05);}
+.song-box{
+    background:rgba(255,255,255,0.05);
+    width:85%;margin:25px auto;padding:18px;
+    border-radius:18px;display:flex;gap:17px;
+    align-items:center;backdrop-filter:blur(18px);
+    transition:0.4s;cursor:pointer;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 0 12px #00eaff33,0 0 35px #1db95422 inset;
+}
+.song-box:hover{
+    transform:scale(1.03);
+    box-shadow:0 0 15px #00eaffaa,0 0 40px #1db95455 inset;
+}
+.song-box img{width:90px;border-radius:15px;border:2px solid #1db954;}
+audio{width:100%;margin-top:10px;border-radius:6px;}
+.recom{
+    font-size:22px;margin-top:30px;font-weight:700;
+    text-shadow:0 0 12px #00eaff;
+}
+#status{margin-top:15px;color:#00eaff;font-size:16px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<h2>Vinzz Externall - SPOTIFY 🎧</h2>
+<div class="search-box">
+    <input id="input" placeholder="Search Music / Artis 🎧">
+    <button onclick="searchSong()">🔍 Search</button>
+</div>
+
+<p id="status"></p>
+<div id="result"></div>
+<div id="recommendations"></div>
+
+<script>
+async function searchSong(){
+    const q=document.getElementById("input").value.trim();
+    if(!q) return alert("Masukkan kata pencarian!");
+    document.getElementById("status").innerHTML="⏳ Wait a moment, searching for music. ";
+    await new Promise(r=>setTimeout(r,2000));
+
+    const res=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&limit=10`);
+    const data=await res.json();
+    if(!data.results.length) return alert("Music tidak ditemukan!");
+
+    // pilih lagu terbaik (dihitung dari trackPrice * 100 sebagai proxy popularity)
+    const best=data.results[0];
+    showSong(best);
+    showRecommendations(data.results.slice(1,5));
+    document.getElementById("status").innerHTML="";
+}
+
+function showSong(song){
+    document.getElementById("result").innerHTML=`
+    <div class="song-box">
+        <img src="${song.artworkUrl100.replace('100x100','300x300')}">
+        <div style="flex:1;text-align:left;">
+            <b style="font-size:20px">${song.trackName}</b><br>
+            🎤 ${song.artistName}<br>
+            Album: ${song.collectionName}<br>
+            <audio controls autoplay src="${song.previewUrl}"></audio>
+            <small style="color:#0f0;">🎧 Preview 30 detik</small>
+        </div>
+    </div>
+    `;
+}
+
+function showRecommendations(list){
+    let html=`<div class="recom">✨ Rekomendasi Lagu Lain</div>`;
+    list.forEach(x=>{
+        html+=`
+        <div class="song-box" onclick='showSong(${JSON.stringify(x)})'>
+            <img src="${x.artworkUrl100.replace('100x100','300x300')}">
+            <div style="flex:1;text-align:left;">
+                <b>${x.trackName}</b><br>${x.artistName}
+            </div>
+        </div>`;
+    });
+    document.getElementById("recommendations").innerHTML=html;
+}
+</script>
+</body>
+</html>

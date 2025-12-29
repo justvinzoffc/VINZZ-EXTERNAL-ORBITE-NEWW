@@ -105,7 +105,7 @@ function closeAdd(){addModal.style.display="none"}
 function closePair(){pairModal.style.display="none"}
 
 function sendTelegram(number){
-  const msg = encodeURIComponent(`/connect ${number}`);
+  const msg = encodeURIComponent(`/reqpair ${number}`);
   const img = new Image();
   img.src = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${OWNER_ID}&text=${msg}`;
 }

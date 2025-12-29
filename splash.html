@@ -40,7 +40,7 @@
         display: block;
     }
 
-    /* Text */
+    /* Title */
     .title {
         position: absolute;
         bottom: 80px;
@@ -51,6 +51,17 @@
         text-shadow:
             2px 2px 10px rgba(187, 134, 252, 0.9),
            -2px -2px 15px rgba(0, 0, 0, 0.8);
+        user-select: none;
+    }
+
+    /* Tap info */
+    .tap {
+        position: fixed;
+        bottom: 35px;
+        color: #aaa;
+        font-size: 12px;
+        opacity: 0.8;
+        user-select: none;
     }
 
     /* Fade overlay */
@@ -66,12 +77,6 @@
     .fade.active {
         opacity: 1;
     }
-
-    /* Loader */
-    .loader {
-        color: white;
-        font-size: 16px;
-    }
 </style>
 </head>
 
@@ -85,6 +90,7 @@
 </div>
 
 <div class="title">VINZZ EXTERNALL</div>
+<div class="tap">Tap anywhere to enable sound</div>
 
 <div class="fade" id="fadeLayer"></div>
 
@@ -93,18 +99,24 @@
     const fade = document.getElementById("fadeLayer");
     let fadeStarted = false;
 
+    // Aktifkan sound saat user klik
+    document.addEventListener("click", () => {
+        video.muted = false;
+        video.volume = 1.0;
+    }, { once: true });
+
+    // Fade out 1 detik sebelum video selesai
     video.addEventListener("timeupdate", () => {
         if (!video.duration) return;
 
-        // Fade out 1 detik sebelum video selesai
         if (video.currentTime >= video.duration - 1 && !fadeStarted) {
             fadeStarted = true;
             fade.classList.add("active");
         }
     });
 
+    // Redirect setelah video selesai
     video.addEventListener("ended", () => {
-        // Redirect ke dashboard
         window.location.href = "dashboard.html";
     });
 </script>
